@@ -1,0 +1,20 @@
+[
+	{
+		"type": "text",
+		"label": "🧲 Magnetic Sidebar",
+		"margin": "8px 4px",
+		"size": "1.2em"
+	},
+	{
+		"type": "checkbox",
+		"property": "magnetic_sidebar.move_tabs",
+		"label": "Move the tab sidebar to the screen edge nearest to the window",
+		"defaultValue": true
+	},
+	{
+		"type": "checkbox",
+		"property": "magnetic_sidebar.move_window_controls",
+		"label": "Keep the window controls on the same side as the sidebar",
+		"defaultValue": true
+	}
+]
