@@ -51,54 +51,74 @@
 
   // ---- Per-window overrides of Zen's cached "sidebar is on the right" ----
 
-  const init = () => {
-    const tabs = gZenVerticalTabsManager;
-    const nativeWindowsButtons = tabs.isWindowsStyledButtons; // read before shadowing
-    let magnetRight = null;
+  const tabs = gZenVerticalTabsManager;
+  const root = document.documentElement;
+  let magnetRight = null;
+  let zenRightSide, nativeWindowsButtons;
 
-    // `!==` on booleans is XOR.
-    const sidebarOnRight = () =>
-      pref(PREFS + "move_tabs", true) && magnetRight !== null
-        ? magnetRight !== pref(PREFS + "invert_tabs", false)
-        : pref("zen.tabs.vertical.right-side", false);
-    // Zen nests the window controls into the sidebar header only when their style matches
-    // the sidebar's side, so declaring the opposite style keeps them in the toolbar instead.
-    const windowsStyledButtons = () =>
-      pref(PREFS + "move_window_controls", true)
-        ? sidebarOnRight() !== pref(PREFS + "controls_outside_sidebar", true)
-        : nativeWindowsButtons;
+  // `!==` on booleans is XOR.
+  const sidebarOnRight = () =>
+    pref(PREFS + "move_tabs", true) && magnetRight !== null
+      ? magnetRight !== pref(PREFS + "invert_tabs", false)
+      : zenRightSide();
+  // Zen nests the window controls into the sidebar header only when their style matches
+  // the sidebar's side, so declaring the opposite style keeps them in the toolbar instead.
+  const windowsStyledButtons = () =>
+    pref(PREFS + "move_window_controls", true)
+      ? sidebarOnRight() !== pref(PREFS + "controls_outside_sidebar", true)
+      : nativeWindowsButtons;
 
-    // Zen caches the pref in four places per window; shadow them all with live getters.
+  // Re-layout only when the DOM disagrees with the wanted state: Zen's _updateEvent() is costly.
+  const apply = () => {
+    if (window.windowState === window.STATE_MINIMIZED) return; // Windows parks minimized windows at -32000,-32000
+    magnetRight = nearestEdgeIsRight();
+    const right = sidebarOnRight() && tabs._prefsVerticalTabs;
+    const reversed = !windowsStyledButtons();
+    if (right === root.hasAttribute("zen-right-side") && reversed === root.hasAttribute("zen-window-buttons-reversed")) return;
+    root.toggleAttribute("zen-window-buttons-reversed", reversed);
+    tabs._updateEvent(); // sets zen-right-side and relocates the window controls
+  };
+
+  let timer;
+  const schedule = () => {
+    clearTimeout(timer);
+    timer = setTimeout(apply, 100); // MozUpdateWindowPos fires on every step of a drag
+  };
+
+  const install = () => {
+    nativeWindowsButtons = tabs.isWindowsStyledButtons; // read before shadowing
+    // Keep Zen's own getter reachable: it owns the weakly registered pref observer that makes
+    // Zen re-layout every window when the pref changes. Read it once first, because the first
+    // read replaces the property with the final getter and would clobber our shadow.
+    void tabs._prefsRightSide;
+    zenRightSide = Object.getOwnPropertyDescriptor(tabs, "_prefsRightSide").get;
+    magnetRight = nearestEdgeIsRight();
+
+    // Zen caches the side in four places per window; shadow them all with live getters.
     const shadow = (obj, prop, get) => Object.defineProperty(obj, prop, { configurable: true, get });
     shadow(tabs, "_prefsRightSide", sidebarOnRight);
     shadow(tabs, "isWindowsStyledButtons", windowsStyledButtons);
     shadow(gZenCompactModeManager, "sidebarIsOnRight", sidebarOnRight);
     shadow(gBrowser.tabContainer, "_sidebarPositionStart", () => !sidebarOnRight());
 
-    let applied;
-    const apply = () => {
-      magnetRight = nearestEdgeIsRight();
-      const state = [sidebarOnRight(), windowsStyledButtons()].join();
-      if (state === applied) return;
-      applied = state;
-      document.documentElement.toggleAttribute("zen-window-buttons-reversed", !windowsStyledButtons());
-      tabs._updateEvent(); // sets zen-right-side and relocates the window controls
-    };
-
-    let timer;
-    const schedule = () => {
-      clearTimeout(timer);
-      timer = setTimeout(apply, 100); // MozUpdateWindowPos fires on every step of a drag
-    };
-
     window.windowRoot.addEventListener("MozUpdateWindowPos", schedule); // chrome-only, non-bubbling
     window.addEventListener("resize", schedule);
     window.addEventListener("sizemodechange", schedule);
     Services.prefs.addObserver(PREFS, schedule);
     window.addEventListener("unload", () => Services.prefs.removeObserver(PREFS, schedule), { once: true });
-
-    apply();
   };
 
-  gZenStartup.promiseInitialized.then(init);
+  if (tabs._multiWindowFeature) {
+    // Zen has already laid out this window.
+    install();
+    apply();
+  } else {
+    // Hook in right after Zen defines its pref getters and before its first layout, so the
+    // window opens with the sidebar already on the right side instead of jumping there.
+    const { initializePreferences } = tabs;
+    tabs.initializePreferences = function (...args) {
+      initializePreferences.apply(this, args);
+      install();
+    };
+  }
 })();
