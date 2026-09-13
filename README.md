@@ -31,6 +31,9 @@ window, the values Zen has cached from those preferences and asks Zen to re-layo
    `https://github.com/D3c3453d/zen-magnetic-sidebar`
 3. Restart Zen.
 
+Sine decides whether an update exists by comparing the `updatedAt` timestamp in
+`theme.json`, not the version number, so every release bumps that timestamp.
+
 ### fx-autoconfig
 
 1. Copy `zen-magnetic-sidebar.uc.js` into `<profile>/chrome/JS/`
