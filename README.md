@@ -56,6 +56,20 @@ Turning both `move_*` options off restores Zen's default behaviour without a res
   and leaves Zen's global setting in effect.
 - macOS has not been tested.
 
+## Security
+
+The script runs with full browser privileges, like any Sine or fx-autoconfig script. It only
+reads window geometry and preferences; it never writes preferences, touches page content
+or makes network requests.
+
+Two things to keep in mind:
+
+- `sine.allow-unsafe-js` is global: it lets *every* non-store mod run JavaScript, not just
+  this one. Only install mods you trust.
+- A mod installed from a repository URL is updated automatically from that repository.
+  If you prefer to review updates yourself, copy `zen-magnetic-sidebar.uc.js` manually
+  (fx-autoconfig method) instead.
+
 ## License
 
 [MIT](LICENSE)

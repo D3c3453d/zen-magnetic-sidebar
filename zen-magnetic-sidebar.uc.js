@@ -5,6 +5,8 @@
 // ==/UserScript==
 
 (() => {
+  if (document.documentElement.getAttribute("chromehidden")?.includes("toolbar")) return; // popup: no sidebar
+
   const PREFS = "magnetic_sidebar.";
   const pref = (name, fallback) => Services.prefs.getBoolPref(name, fallback);
 
@@ -30,14 +32,15 @@
   // Gecko cannot enumerate monitors, but screenForRect() returns the screen nearest to a
   // point, so we hop from neighbour to neighbour until no screen lies beyond the edge.
   const desktopEdge = (screen, dir) => {
-    for (;;) {
+    for (let hops = 0; hops < 16; hops++) {
       const x = dir < 0 ? screen.left - 1 : screen.right;
       const y = Math.round((screen.top + screen.bottom) / 2);
       const next = screenRect(box(x, y, 1, 1));
       const beyond = dir < 0 ? next.right <= screen.left : next.left >= screen.right;
-      if (!beyond) return dir < 0 ? screen.left : screen.right;
+      if (!beyond) break;
       screen = next;
     }
+    return dir < 0 ? screen.left : screen.right;
   };
 
   // true = right edge is nearer, false = left, null = equidistant
@@ -70,7 +73,7 @@
 
   // Re-layout only when the DOM disagrees with the wanted state: Zen's _updateEvent() is costly.
   const apply = () => {
-    if (window.windowState === window.STATE_MINIMIZED) return; // Windows parks minimized windows at -32000,-32000
+    if (window.closed || window.windowState === window.STATE_MINIMIZED) return; // Windows parks minimized windows at -32000,-32000
     magnetRight = nearestEdgeIsRight();
     const right = sidebarOnRight() && tabs._prefsVerticalTabs;
     const reversed = !windowsStyledButtons();
@@ -105,20 +108,38 @@
     window.addEventListener("resize", schedule);
     window.addEventListener("sizemodechange", schedule);
     Services.prefs.addObserver(PREFS, schedule);
-    window.addEventListener("unload", () => Services.prefs.removeObserver(PREFS, schedule), { once: true });
+    window.addEventListener(
+      "unload",
+      () => {
+        clearTimeout(timer);
+        Services.prefs.removeObserver(PREFS, schedule);
+      },
+      { once: true }
+    );
+  };
+
+  // A failure of this mod must stay a console error, never break Zen's own window setup.
+  const guarded = fn => {
+    try {
+      fn();
+    } catch (e) {
+      console.error("[magnetic-sidebar]", e);
+    }
   };
 
   if (tabs._multiWindowFeature) {
     // Zen has already laid out this window.
-    install();
-    apply();
+    guarded(() => {
+      install();
+      apply();
+    });
   } else {
     // Hook in right after Zen defines its pref getters and before its first layout, so the
     // window opens with the sidebar already on the right side instead of jumping there.
     const { initializePreferences } = tabs;
     tabs.initializePreferences = function (...args) {
       initializePreferences.apply(this, args);
-      install();
+      guarded(install);
     };
   }
 })();
