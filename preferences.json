@@ -7,8 +7,36 @@
 	},
 	{
 		"type": "checkbox",
+		"property": "magnetic_sidebar.invert_tabs",
+		"label": "Invert: keep the sidebar on the side away from the nearest edge",
+		"defaultValue": false,
+		"conditions": [
+			{
+				"if": {
+					"property": "magnetic_sidebar.move_tabs",
+					"value": true
+				}
+			}
+		]
+	},
+	{
+		"type": "checkbox",
 		"property": "magnetic_sidebar.move_window_controls",
-		"label": "Keep the window controls on the same side as the sidebar",
+		"label": "Place the window controls relative to the sidebar",
 		"defaultValue": true
+	},
+	{
+		"type": "checkbox",
+		"property": "magnetic_sidebar.invert_window_controls",
+		"label": "Invert: window controls on the opposite side from the sidebar (off = same side)",
+		"defaultValue": true,
+		"conditions": [
+			{
+				"if": {
+					"property": "magnetic_sidebar.move_window_controls",
+					"value": true
+				}
+			}
+		]
 	}
 ]

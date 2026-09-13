@@ -56,12 +56,15 @@
     const nativeWindowsButtons = tabs.isWindowsStyledButtons; // read before shadowing
     let magnetRight = null;
 
+    // `!==` on booleans is XOR: the invert_* prefs flip the side.
     const sidebarOnRight = () =>
       pref(PREFS + "move_tabs", true) && magnetRight !== null
-        ? magnetRight
+        ? magnetRight !== pref(PREFS + "invert_tabs", false)
         : pref("zen.tabs.vertical.right-side", false);
     const windowsStyledButtons = () =>
-      pref(PREFS + "move_window_controls", true) ? sidebarOnRight() : nativeWindowsButtons;
+      pref(PREFS + "move_window_controls", true)
+        ? sidebarOnRight() !== pref(PREFS + "invert_window_controls", true)
+        : nativeWindowsButtons;
 
     // Zen caches the pref in four places per window; shadow them all with live getters.
     const shadow = (obj, prop, get) => Object.defineProperty(obj, prop, { configurable: true, get });

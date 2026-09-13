@@ -1,7 +1,7 @@
 {
 	"id": "zen-magnetic-sidebar",
 	"name": "Magnetic Sidebar",
-	"description": "Moves each window's tab sidebar and window controls to the screen edge nearest to that window.",
+	"description": "Moves each window's tab sidebar to the screen edge nearest to that window and places the window controls relative to it.",
 	"homepage": "https://github.com/D3c3453d/zen-magnetic-sidebar",
 	"readme": "https://raw.githubusercontent.com/D3c3453d/zen-magnetic-sidebar/main/README.md",
 	"scripts": {
@@ -11,9 +11,9 @@
 	},
 	"preferences": "preferences.json",
 	"author": "D3c3453d",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"tags": ["sidebar", "tabs", "multi-monitor", "window-controls"],
 	"createdAt": "2026-09-12",
-	"updatedAt": "2026-09-12",
+	"updatedAt": "2026-09-13",
 	"fork": ["zen"]
 }
