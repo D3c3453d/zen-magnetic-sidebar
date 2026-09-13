@@ -3,8 +3,8 @@
 Keeps the vertical tab sidebar on the screen edge nearest to the window, **per window**:
 a window on the left monitor gets its sidebar on the left, a window on the right monitor
 gets it on the right. The window controls (close / minimize / maximize) are placed relative
-to the sidebar: on the opposite side by default, or on the same side if you prefer.
-Both placements can be inverted in the settings.
+to the sidebar too: by default they stay out of it, in the main toolbar; optionally they
+move into the sidebar header. The sidebar placement can also be inverted in the settings.
 
 The side is re-evaluated whenever the window is moved, resized, maximized or restored.
 When both edges are equally far away (for example, a window maximized on a single monitor)
@@ -45,8 +45,8 @@ Available in Sine's mod settings, or in `about:config`:
 |---|---|---|---|
 | `magnetic_sidebar.move_tabs` | Boolean | `true` | Move the tab sidebar to the nearest screen edge (per-window `zen.tabs.vertical.right-side`). |
 | `magnetic_sidebar.invert_tabs` | Boolean | `false` | Invert: keep the sidebar on the side away from the nearest edge. |
-| `magnetic_sidebar.move_window_controls` | Boolean | `true` | Place the window controls relative to the sidebar (per-window `zen.view.experimental-force-window-controls-left`). |
-| `magnetic_sidebar.invert_window_controls` | Boolean | `true` | Invert: controls on the opposite side from the sidebar. Off puts them on the same side. |
+| `magnetic_sidebar.move_window_controls` | Boolean | `true` | Let the mod place the window controls (per-window `zen.view.experimental-force-window-controls-left`). |
+| `magnetic_sidebar.controls_outside_sidebar` | Boolean | `true` | Keep the window controls out of the sidebar, in the main toolbar. Off moves them into the sidebar header, on the sidebar's side. |
 
 Turning both `move_*` options off restores Zen's default behaviour without a restart.
 

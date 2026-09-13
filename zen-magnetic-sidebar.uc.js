@@ -56,14 +56,16 @@
     const nativeWindowsButtons = tabs.isWindowsStyledButtons; // read before shadowing
     let magnetRight = null;
 
-    // `!==` on booleans is XOR: the invert_* prefs flip the side.
+    // `!==` on booleans is XOR.
     const sidebarOnRight = () =>
       pref(PREFS + "move_tabs", true) && magnetRight !== null
         ? magnetRight !== pref(PREFS + "invert_tabs", false)
         : pref("zen.tabs.vertical.right-side", false);
+    // Zen nests the window controls into the sidebar header only when their style matches
+    // the sidebar's side, so declaring the opposite style keeps them in the toolbar instead.
     const windowsStyledButtons = () =>
       pref(PREFS + "move_window_controls", true)
-        ? sidebarOnRight() !== pref(PREFS + "invert_window_controls", true)
+        ? sidebarOnRight() !== pref(PREFS + "controls_outside_sidebar", true)
         : nativeWindowsButtons;
 
     // Zen caches the pref in four places per window; shadow them all with live getters.

@@ -22,13 +22,13 @@
 	{
 		"type": "checkbox",
 		"property": "magnetic_sidebar.move_window_controls",
-		"label": "Place the window controls relative to the sidebar",
+		"label": "Let the mod place the window controls",
 		"defaultValue": true
 	},
 	{
 		"type": "checkbox",
-		"property": "magnetic_sidebar.invert_window_controls",
-		"label": "Invert: window controls on the opposite side from the sidebar (off = same side)",
+		"property": "magnetic_sidebar.controls_outside_sidebar",
+		"label": "Keep the window controls out of the sidebar, in the toolbar (off = inside the sidebar header)",
 		"defaultValue": true,
 		"conditions": [
 			{
