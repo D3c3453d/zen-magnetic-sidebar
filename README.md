@@ -1,14 +1,20 @@
 # Magnetic Sidebar for Zen Browser
 
-Keeps the vertical tab sidebar on the screen edge nearest to the window, **per window**:
-a window on the left monitor gets its sidebar on the left, a window on the right monitor
-gets it on the right. The window controls (close / minimize / maximize) are placed relative
-to the sidebar too: by default they stay out of it, in the main toolbar; optionally they
-move into the sidebar header. The sidebar placement can also be inverted in the settings.
+Keeps the vertical tab sidebar on the screen edge nearest to the window, **per window**.
+On a multi-monitor desktop a window on the left monitor gets its sidebar on the left and a
+window on the right monitor gets it on the right. On a single monitor the same rule applies
+to any window that is not maximized: snapped or dragged to the left half of the screen
+(for example with Win+←) it gets the sidebar on the left, to the right half, on the right.
+The window controls (close / minimize / maximize) are placed relative to the sidebar too:
+by default they stay out of it, in the main toolbar; optionally they move into the sidebar
+header. The sidebar placement can also be inverted in the settings.
 
-The side is re-evaluated whenever the window is moved, resized, maximized or restored.
-When both edges are equally far away (for example, a window maximized on a single monitor)
-the mod defers to Zen's own `zen.tabs.vertical.right-side` setting.
+The side follows the window live: it is re-evaluated whenever the window is moved, resized,
+maximized or restored. Drag a window from one edge of the desktop to the other and the
+sidebar switches sides as soon as the window passes the centre, so the tabs always sit on
+the outer edge and never end up in the middle of the desktop between two side-by-side
+windows. When both edges are equally far away (for example, a window maximized on a single
+monitor) the mod defers to Zen's own `zen.tabs.vertical.right-side` setting.
 
 Zen's `zen.tabs.vertical.right-side` and `zen.view.experimental-force-window-controls-left`
 preferences are global, so the mod never writes them. Instead it overrides, inside each
