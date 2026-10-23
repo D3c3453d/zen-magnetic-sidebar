@@ -1,24 +1,35 @@
 # Magnetic Sidebar for Zen Browser
 
+![Two monitors: the left window has its tabs on the left edge, the right window on the right edge, and both keep the window controls in the toolbar](docs/cover.png)
+
 Keeps the vertical tab sidebar on the screen edge nearest to the window, **per window**.
-On a multi-monitor desktop a window on the left monitor gets its sidebar on the left and a
-window on the right monitor gets it on the right. On a single monitor the same rule applies
-to any window that is not maximized: snapped or dragged to the left half of the screen
-(for example with Win+←) it gets the sidebar on the left, to the right half, on the right.
-The window controls (close / minimize / maximize) are placed relative to the sidebar too:
-by default they stay out of it, in the main toolbar; optionally they move into the sidebar
-header. The sidebar placement can also be inverted in the settings.
 
-The side follows the window live: it is re-evaluated whenever the window is moved, resized,
-maximized or restored. Drag a window from one edge of the desktop to the other and the
-sidebar switches sides as soon as the window passes the centre, so the tabs always sit on
-the outer edge and never end up in the middle of the desktop between two side-by-side
-windows. When both edges are equally far away (for example, a window maximized on a single
-monitor) the mod defers to Zen's own `zen.tabs.vertical.right-side` setting.
+- **Multiple monitors:** a window on the left monitor gets its sidebar on the left, and a
+  window on the right monitor gets it on the right.
+- **Single monitor:** the same rule applies to any window that is not maximized. Snap or
+  drag a window to the left half of the screen (for example with Win+←) and its sidebar
+  moves to the left; move it to the right half and the sidebar follows to the right.
+  A maximized window is equally far from both edges, so it keeps Zen's own setting.
 
-Zen's `zen.tabs.vertical.right-side` and `zen.view.experimental-force-window-controls-left`
-preferences are global, so the mod never writes them. Instead it overrides, inside each
-window, the values Zen has cached from those preferences and asks Zen to re-layout.
+The window controls (the titlebar buttons: close, minimize, maximize) are placed relative
+to the sidebar. By default they stay out of it, in the main toolbar. Optionally, they can
+move into the sidebar header instead. The sidebar placement can also be inverted in the
+settings.
+
+The side follows the window live. It is re-evaluated whenever the window is moved, resized,
+maximized or restored. While you drag a window across the desktop, the sidebar switches
+sides as soon as the window passes the center. That way the tabs always sit on the outer
+edge, never in the middle between two side-by-side windows.
+
+## Demo
+
+### Multiple monitors
+
+![A window dragged between two monitors: its tab sidebar jumps to the outer edge of the monitor it is on](docs/multi-monitor.gif)
+
+### Single monitor
+
+![A window snapped and dragged between the halves of one screen: its tab sidebar follows to the nearer edge](docs/single-monitor.gif)
 
 ## Requirements
 
@@ -37,9 +48,6 @@ window, the values Zen has cached from those preferences and asks Zen to re-layo
    `https://github.com/D3c3453d/zen-magnetic-sidebar`
 3. Restart Zen.
 
-Sine decides whether an update exists by comparing the `updatedAt` timestamp in
-`theme.json`, not the version number, so every release bumps that timestamp.
-
 ### fx-autoconfig
 
 1. Copy `zen-magnetic-sidebar.uc.js` into `<profile>/chrome/JS/`
@@ -52,18 +60,29 @@ Available in Sine's mod settings, or in `about:config`:
 
 | Preference | Type | Default | Effect |
 |---|---|---|---|
-| `magnetic_sidebar.move_tabs` | Boolean | `true` | Move the tab sidebar to the nearest screen edge (per-window `zen.tabs.vertical.right-side`). |
+| `magnetic_sidebar.move_tabs` | Boolean | `true` | Move the tab sidebar to the screen edge nearest to the window. |
 | `magnetic_sidebar.invert_tabs` | Boolean | `false` | Invert: keep the sidebar on the side away from the nearest edge. |
-| `magnetic_sidebar.move_window_controls` | Boolean | `true` | Let the mod place the window controls (per-window `zen.view.experimental-force-window-controls-left`). |
+| `magnetic_sidebar.move_window_controls` | Boolean | `true` | Let the mod place the window controls relative to the sidebar. |
 | `magnetic_sidebar.controls_outside_sidebar` | Boolean | `true` | Keep the window controls out of the sidebar, in the main toolbar. Off moves them into the sidebar header, on the sidebar's side. |
 
-Turning both `move_*` options off restores Zen's default behaviour without a restart.
+Turning both `move_*` options off restores Zen's default behavior without a restart.
 
 ## Limitations
 
 - Wayland does not expose window positions, so the mod cannot tell where a window is
   and leaves Zen's global setting in effect.
 - macOS has not been tested.
+
+## How it works
+
+Zen stores the sidebar side in `zen.tabs.vertical.right-side` and the window controls side
+in `zen.view.experimental-force-window-controls-left`. Both preferences are global, so the
+mod never writes them. Instead, inside each window, it overrides the values Zen has cached
+from those preferences and asks Zen to re-layout. `move_tabs` controls the first override
+and `move_window_controls` the second.
+
+When both screen edges are equally far away (for example, a maximized window on a single
+monitor), the mod uses the value of `zen.tabs.vertical.right-side`.
 
 ## Security
 
